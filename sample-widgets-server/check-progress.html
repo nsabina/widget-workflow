@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Progress Widget</title>
+  <link rel="stylesheet" href="css/sample-widgets.css">  
+  
+    <!-- Injecting workflow manager stub-->
+  <script src="js/workflow-stubs.js" type="text/javascript"></script>
+  
+  <script>
+  
+  if(typeof(WidgetsApp) === 'undefined') {
+	  WidgetsApp = {};
+  }
+  
+  WidgetsApp.workflows = {};
+  
+  WidgetsApp.setContext = function(workflowId, context, contextType) {
+      this.workflowId = workflowId;
+   	  if(contextType === "application/object") {
+    	  this.workflows[workflowId] = {
+    			  "context" : context,
+    			  "contextType": contextType
+    	  };
+      } else {
+    	  this.workflows[workflowId] = {
+    			  "context" : JSON.parse(context),
+    			  "contextType": contextType
+    	  };
+      }
+      
+      var elem = document.createElement("img");
+      elem.id = workflowId;
+      elem.src = "img/ajax-loader-grey.gif";
+      document.getElementById("statuses").appendChild(elem);
+      
+      if(!context) {
+    	  var statusElement = document.getElementById(workflowId);
+          if(statusElement) {
+              document.getElementById("statuses").removeChild(statusElement);
+          }
+          return this.workflowId;
+      }
+      
+      setTimeout(
+    	        function() {
+    	          if(typeof WorkflowManager !== 'undefined') {
+    	              //WorkflowManager.completeWorkflow(WidgetsApp.workflowId);
+    	              
+    	              var workflow = WidgetsApp.workflows[workflowId];
+    	              console.log("Removing workflow context " + workflow + " for workflow " + workflowId);
+    	              WorkflowManager.next(
+    	                      workflowId,
+    	                      window.location.protocol 
+    	                         + "//" + window.location.hostname
+    	                         + ":" + window.location.port
+    	                         + "/share-widgets-step3.html",
+    	                         workflow.contextType === "application/object" ? workflow.context: JSON.stringify(workflow.context),
+    	                         workflow.contextType);
+    	              WidgetsApp.workflows[workflowId] = null;
+    	              var statusElement = document.getElementById(workflowId);
+    	              if(statusElement) {
+    	            	  document.getElementById("statuses").removeChild(statusElement);
+    	              }
+    	          }
+    	        },
+    	        4000
+    	      );
+      return this.workflowId;
+  };
+  
+  </script>
+</head>
+<body>
+<head>
+
+
+<body onload="WidgetsApp.initialize()">
+    <div id = "statuses">
+        <!--  <img src="img/ajax-loader-blue.gif"> Checking progress... -->
+    </div>
+</body>
+
+</html>

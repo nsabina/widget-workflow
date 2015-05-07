@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Sample 3rd party app</title>
+  <!-- load javascript to fetch widgets -->
+  <script type="text/javascript" src="//localhost:9000/js/wf-sdk.js"></script>
+</head>
+<body>
+<head>
+
+
+<body onload="WorkflowManager.init()">
+  <input value="Share" type="submit" 
+    onclick="WorkflowManager.startWorkflow('http://localhost:8000/share-widgets-step1.html', {visitorId:'visitor00012345', visitorName:'Paul Smith'})">
+</body>
+
+</html>

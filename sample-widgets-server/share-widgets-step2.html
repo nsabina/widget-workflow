@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Sample Widget</title>
+  
+  <link rel="stylesheet" href="css/sample-widgets.css">  
+  <link rel="stylesheet" href="css/jquery-ui.min.css">
+  <script src="js/jquery-1.11.1.min.js"></script>
+  <script src="js/jquery-ui-1.10.4.min.js"></script>
+  
+  <!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.js"></script>  -->
+   
+  <!-- Injecting workflow manager stub-->
+  <script src="js/workflow-stubs.js" type="text/javascript"></script>
+
+
+  <script>
+  
+  
+  if(typeof(WidgetsApp) === 'undefined') {
+	  WidgetsApp = {};
+  }
+  
+  WidgetsApp.setContext = function(workflowId, context, contextType) {
+	  if(!workflowId) {
+		  workflowId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r&0x3|0x8);
+			    return v.toString(16);
+		  });
+	  }
+	  console.log("Context: " + context);
+	  this.workflowId = workflowId;
+	  this.contextType = contextType;
+	  if(contextType === "application/object") {
+		  this.context = context;
+	  } else {
+		  this.context = JSON.parse(context);
+	  }
+	  var content =  $("#content");
+	  content.text('Step 2. Visitor ' 
+              + this.context.visitorName + ' with visitor id ' + this.context.visitorId + ' is going to do happy dance.');
+	  
+	  return this.workflowId;
+  };
+  
+
+  $(window).load(function() {
+	  
+	  WidgetsApp.initialize(); 
+
+        $(window).resize(function(){
+              $("#dialog").dialog("option","position","center");
+          });
+        
+          $("#dialog").dialog({
+        	  width: 350,
+        	  height: 140,
+        	  buttons: [ 
+             { 
+               text: "Share", 
+               click: function() { 
+                     //window['test1'] = 'hello';
+
+                     $(this).dialog("close"); 
+                     if(typeof WorkflowManager !== 'undefined') {
+                         //WorkflowManager.next(workflowId, nextStepUrl, contextData, contextType)
+                         WorkflowManager.waitAndCheckProgress(
+                                 WidgetsApp.workflowId,
+                                 window.location.protocol 
+                                    + "//" + window.location.hostname
+                                    + ":" + window.location.port
+                                    + "/check-progress.html",
+                                 WidgetsApp.contextType === "application/object" ? WidgetsApp.context: JSON.stringify(WidgetsApp.context),
+                                 WidgetsApp.contextType);
+                     }
+                   } 
+             } ] });
+          
+          
+          var checker = setInterval(function () {
+              if(typeof WorkflowManager !== 'undefined' && !WorkflowManager.stub) {
+                  onWorkflowObjectInjected();
+                  clearInterval(checker);
+              }
+          }, 1);
+          
+          var onWorkflowObjectInjected = function() {
+          	WorkflowManager.adjustMainWindow($("#dialog").parent().outerWidth(), $("#dialog").parent().outerHeight(), 0);
+          };
+          
+	});
+  
+  </script>
+</head>
+
+<body>
+	<div id="dialog" title="Basic dialog">
+  		<div id='content'></div>
+	</div>
+</body>
+
+</html>
