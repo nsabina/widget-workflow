@@ -1,4 +1,6 @@
 # widget-workflow
+Read more at http://nsabina.blogspot.com/2015/05/beyond-facebook-share.html
+
 Note: running these projects require Node JS:
 
 To check out web application rendering widget please run as described below:
@@ -22,4 +24,3 @@ type command: node js/web-server.js 8000
 
 2) Launch MainWindow class of JavaFX project
 
-widget-workflow
